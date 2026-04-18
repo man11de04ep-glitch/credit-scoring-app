@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Sparkles } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,18 @@ export const AppLayout = () => {
             <LogOut className="h-4 w-4 mr-1.5" /> Sign out
           </Button>
         </header>
+
+        <div
+          role="note"
+          className="mb-6 flex gap-2.5 rounded-xl border border-border/70 bg-secondary/40 px-3.5 py-2.5 text-xs text-muted-foreground"
+        >
+          <Info className="h-4 w-4 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
+          <p className="leading-relaxed">
+            <span className="font-medium text-foreground">Local-only demo.</span> No accounts or
+            passwords — your data is stored only in this browser and is visible to anyone using
+            this device. Avoid entering real banking details.
+          </p>
+        </div>
 
         <div className="grid lg:grid-cols-[220px_1fr] gap-6">
           <nav className="lg:sticky lg:top-6 lg:h-[calc(100vh-7rem)] lg:self-start">
