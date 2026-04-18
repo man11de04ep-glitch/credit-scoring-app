@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { storage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
+import { CompareAttempts } from "@/components/CompareAttempts";
 
 const History = () => {
   const attempts = storage.getAttempts();
@@ -69,6 +70,8 @@ const History = () => {
           <span>{new Date(chronological[chronological.length - 1].createdAt).toLocaleDateString()}</span>
         </div>
       </div>
+
+      <CompareAttempts attempts={attempts} />
 
       <div className="warm-card overflow-hidden">
         <table className="w-full text-sm">
