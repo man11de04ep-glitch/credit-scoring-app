@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Bot, Send, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -69,10 +69,10 @@ function answer(question: string, result: ScoreResult): string {
 const Chat = () => {
   const profile = storage.getProfile();
   const user = storage.getUser();
-  if (!profile) return <Navigate to="/app/onboarding" replace />;
-
-  const result = computeScore(profile);
-  const [messages, setMessages] = useState<Msg[]>(() => greeting(user?.name ?? "there", result));
+  const result = useMemo(() => (profile ? computeScore(profile) : null), [profile]);
+  const [messages, setMessages] = useState<Msg[]>(() =>
+    result ? greeting(user?.name ?? "there", result) : []
+  );
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -80,6 +80,8 @@ const Chat = () => {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
+
+  if (!profile || !result) return <Navigate to="/app/onboarding" replace />;
 
   const send = () => {
     const text = input.trim();

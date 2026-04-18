@@ -12,15 +12,15 @@ import { toast } from "sonner";
 
 const Simulator = () => {
   const stored = storage.getProfile();
-  if (!stored) return <Navigate to="/app/onboarding" replace />;
+  const baseline = useMemo(() => (stored ? computeScore(stored) : null), [stored]);
+  const [draft, setDraft] = useState<FinancialProfile | null>(stored);
+  const result = useMemo(() => (draft ? computeScore(draft) : null), [draft]);
 
-  const baseline = useMemo(() => computeScore(stored), [stored]);
-  const [draft, setDraft] = useState<FinancialProfile>(stored);
-  const result = useMemo(() => computeScore(draft), [draft]);
+  if (!stored || !baseline || !draft || !result) return <Navigate to="/app/onboarding" replace />;
   const delta = result.score - baseline.score;
 
   const update = <K extends keyof FinancialProfile>(k: K, v: FinancialProfile[K]) =>
-    setDraft((prev) => ({ ...prev, [k]: v }));
+    setDraft((prev) => (prev ? { ...prev, [k]: v } : prev));
 
   return (
     <div className="space-y-6 animate-float-up">

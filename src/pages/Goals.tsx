@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { storage, DEFAULT_HABITS, type Habit } from "@/lib/storage";
 import { computeScore } from "@/lib/scoring";
@@ -11,14 +11,18 @@ import { toast } from "sonner";
 
 const Goals = () => {
   const profile = storage.getProfile();
-  if (!profile) return <Navigate to="/app/onboarding" replace />;
-  const result = computeScore(profile);
-
-  const [goal, setGoal] = useState(storage.getGoal());
-  const [target, setTarget] = useState<number>(goal?.targetScore ?? Math.min(900, result.score + 80));
-  const [byDate, setByDate] = useState<string>(goal?.byDate ?? defaultDate(60));
-  const [habits, setHabits] = useState<Habit[]>(storage.getHabits());
+  const result = useMemo(() => (profile ? computeScore(profile) : null), [profile]);
+  const initialGoal = useMemo(() => storage.getGoal(), []);
+  const initialHabits = useMemo(() => storage.getHabits(), []);
+  const [goal, setGoal] = useState(initialGoal);
+  const [target, setTarget] = useState<number>(
+    initialGoal?.targetScore ?? Math.min(900, (result?.score ?? 600) + 80)
+  );
+  const [byDate, setByDate] = useState<string>(initialGoal?.byDate ?? defaultDate(60));
+  const [habits, setHabits] = useState<Habit[]>(initialHabits);
   const [newHabit, setNewHabit] = useState("");
+
+  if (!profile || !result) return <Navigate to="/app/onboarding" replace />;
 
   const saveGoal = () => {
     if (target <= result.score) {
