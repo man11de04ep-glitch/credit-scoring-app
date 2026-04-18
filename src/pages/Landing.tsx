@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Sparkles, Bot, ShieldCheck, TrendingUp, ArrowRight } from "lucide-react";
+import { Sparkles, ShieldCheck, TrendingUp, ArrowRight, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { storage } from "@/lib/storage";
 import heroIllustration from "@/assets/hero-illustration.jpg";
@@ -122,19 +122,7 @@ const Stat = ({ value, label }: { value: string; label: string }) => (
   </div>
 );
 
-const ChatBubble = ({ role, children }: { role: "bot" | "user"; children: React.ReactNode }) => (
-  <div className={role === "bot" ? "flex" : "flex justify-end"}>
-    <div
-      className={
-        role === "bot"
-          ? "rounded-2xl rounded-bl-md bg-secondary px-4 py-2.5 text-sm max-w-[85%]"
-          : "rounded-2xl rounded-br-md bg-gradient-warm text-primary-foreground px-4 py-2.5 text-sm max-w-[85%]"
-      }
-    >
-      {children}
-    </div>
-  </div>
-);
+
 
 const Feature = ({ icon: Icon, title, desc }: { icon: React.ElementType; title: string; desc: string }) => (
   <div className="warm-card p-6">
