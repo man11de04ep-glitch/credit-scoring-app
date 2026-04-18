@@ -1,7 +1,8 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Sparkles, Bot, ShieldCheck, TrendingUp, ArrowRight } from "lucide-react";
+import { Sparkles, ShieldCheck, TrendingUp, ArrowRight, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { storage } from "@/lib/storage";
+import heroIllustration from "@/assets/hero-illustration.jpg";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -64,31 +65,23 @@ const Landing = () => {
         </div>
 
         <div className="relative">
-          <div className="absolute -inset-8 bg-gradient-warm opacity-20 blur-3xl rounded-full" />
-          <div className="relative warm-card p-8 space-y-5">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Bot className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">Smart Credit assistant</p>
-                <p className="text-xs text-muted-foreground">Online · usually replies instantly</p>
-              </div>
-            </div>
-            <ChatBubble role="bot">
-              Hi! I'm here to help you understand your credit. What's your monthly income roughly?
-            </ChatBubble>
-            <ChatBubble role="user">Around ₹28,000.</ChatBubble>
-            <ChatBubble role="bot">
-              Great. And do you usually pay your phone & electricity bills on time?
-            </ChatBubble>
-            <ChatBubble role="user">Mostly yes — sometimes a few days late.</ChatBubble>
-            <div className="rounded-2xl bg-gradient-warm/10 border border-primary/20 p-4">
+          <div className="absolute -inset-10 bg-gradient-warm opacity-25 blur-3xl rounded-full" />
+          <div className="relative warm-card p-3 sm:p-4 overflow-hidden">
+            <img
+              src={heroIllustration}
+              alt="Illustration of a glowing credit score gauge surrounded by leaves, growth bars and a friendly chat bubble"
+              width={1280}
+              height={1280}
+              className="w-full h-auto rounded-2xl"
+            />
+            <div className="absolute left-6 bottom-6 right-6 sm:left-8 sm:bottom-8 sm:right-auto sm:max-w-xs rounded-2xl bg-card/90 backdrop-blur-md border border-border/60 shadow-card p-4">
               <div className="flex items-center gap-2 text-xs text-primary font-medium uppercase tracking-wide">
-                <TrendingUp className="h-3.5 w-3.5" /> Estimated score
+                <TrendingUp className="h-3.5 w-3.5" /> Live preview
               </div>
-              <div className="font-display text-4xl font-semibold mt-1 gradient-text">642</div>
-              <p className="text-xs text-muted-foreground">Setting bill autopay could lift you to ~710.</p>
+              <div className="font-display text-3xl font-semibold mt-1 gradient-text">642 → 710</div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Setting bill autopay alone can lift your score by ~70 points.
+              </p>
             </div>
           </div>
         </div>
@@ -129,19 +122,7 @@ const Stat = ({ value, label }: { value: string; label: string }) => (
   </div>
 );
 
-const ChatBubble = ({ role, children }: { role: "bot" | "user"; children: React.ReactNode }) => (
-  <div className={role === "bot" ? "flex" : "flex justify-end"}>
-    <div
-      className={
-        role === "bot"
-          ? "rounded-2xl rounded-bl-md bg-secondary px-4 py-2.5 text-sm max-w-[85%]"
-          : "rounded-2xl rounded-br-md bg-gradient-warm text-primary-foreground px-4 py-2.5 text-sm max-w-[85%]"
-      }
-    >
-      {children}
-    </div>
-  </div>
-);
+
 
 const Feature = ({ icon: Icon, title, desc }: { icon: React.ElementType; title: string; desc: string }) => (
   <div className="warm-card p-6">
