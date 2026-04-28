@@ -1,8 +1,9 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Sparkles, ShieldCheck, TrendingUp, ArrowRight, Bot } from "lucide-react";
+import { ShieldCheck, TrendingUp, ArrowRight, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { storage } from "@/lib/storage";
 import heroIllustration from "@/assets/hero-illustration.jpg";
+import logo from "@/assets/smart-credit-logo.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -12,9 +13,13 @@ const Landing = () => {
     <div className="min-h-screen bg-gradient-soft">
       <header className="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="h-9 w-9 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
-          </div>
+          <img
+            src={logo}
+            alt="Smart Credit logo"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-xl shadow-warm object-cover"
+          />
           <span className="font-display text-lg font-semibold">Smart Credit</span>
         </div>
         <Button
