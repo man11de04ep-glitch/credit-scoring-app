@@ -1,8 +1,9 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Sparkles, Info, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Info, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/smart-credit-logo.png";
 
 const nav = [
   { to: "/app", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -36,9 +37,13 @@ export const AppLayout = () => {
               <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
             </Button>
             <div className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
+              <img
+                src={logo}
+                alt="Smart Credit logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-xl shadow-warm object-cover"
+              />
               <div>
                 <p className="font-display text-lg font-semibold leading-tight">Smart Credit</p>
                 <p className="text-xs text-muted-foreground leading-tight">
