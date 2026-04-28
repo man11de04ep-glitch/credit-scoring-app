@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ScoreGauge } from "@/components/ScoreGauge";
-import { computeScore } from "@/lib/scoring";
+import { FactorChart } from "@/components/FactorChart";
+import { getCurrentAssessment } from "@/lib/engine";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target } from "lucide-react";
+import { ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const profile = storage.getProfile();
   const attempts = storage.getAttempts();
   const habits = storage.getHabits();
   const goal = storage.getGoal();
 
-  const result = useMemo(() => (profile ? computeScore(profile) : null), [profile]);
+  const result = useMemo(() => getCurrentAssessment(), []);
 
-  if (!profile || !result) return <Navigate to="/app/onboarding" replace />;
+  if (!result) return <Navigate to="/app/onboarding" replace />;
 
   const previous = attempts[1]?.score;
   const delta = previous !== undefined ? result.score - previous : 0;
