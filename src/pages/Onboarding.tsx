@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ProfileForm } from "@/components/ProfileForm";
-import { computeScore } from "@/lib/scoring";
-import { storage } from "@/lib/storage";
+import { submitAssessment } from "@/lib/engine";
 import { toast } from "sonner";
 
 const Onboarding = () => {
@@ -22,16 +21,8 @@ const Onboarding = () => {
       <div className="warm-card p-6 lg:p-8">
         <ProfileForm
           onSubmit={(profile) => {
-            const result = computeScore(profile);
-            storage.saveProfile(profile);
-            storage.saveAttempt({
-              id: crypto.randomUUID(),
-              createdAt: new Date().toISOString(),
-              profile,
-              score: result.score,
-              band: result.band,
-            });
-            toast.success(`Your score: ${result.score}`);
+            const assessment = submitAssessment(profile);
+            toast.success(`Your score: ${assessment.score}`);
             navigate("/app");
           }}
         />

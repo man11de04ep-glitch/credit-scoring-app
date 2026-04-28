@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ScoreGauge } from "@/components/ScoreGauge";
-import { computeScore } from "@/lib/scoring";
+import { FactorChart } from "@/components/FactorChart";
+import { getCurrentAssessment } from "@/lib/engine";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target } from "lucide-react";
+import { ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
-  const profile = storage.getProfile();
   const attempts = storage.getAttempts();
   const habits = storage.getHabits();
   const goal = storage.getGoal();
 
-  const result = useMemo(() => (profile ? computeScore(profile) : null), [profile]);
+  const result = useMemo(() => getCurrentAssessment(), []);
 
-  if (!profile || !result) return <Navigate to="/app/onboarding" replace />;
+  if (!result) return <Navigate to="/app/onboarding" replace />;
 
   const previous = attempts[1]?.score;
   const delta = previous !== undefined ? result.score - previous : 0;
@@ -142,6 +142,23 @@ const Dashboard = () => {
               </li>
             ))}
         </ul>
+      </div>
+
+      {/* Recharts factor chart */}
+      <div className="warm-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-xl font-semibold">Factor strength vs weight</h2>
+        </div>
+        <FactorChart data={result.factorChartData} />
+        <div className="flex gap-5 text-xs text-muted-foreground mt-3">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-primary" /> Your sub-score (0–100)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-accent" /> Factor weight (%)
+          </span>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
