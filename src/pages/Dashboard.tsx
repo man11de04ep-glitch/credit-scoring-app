@@ -1,21 +1,47 @@
 import { useMemo } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { FactorChart } from "@/components/FactorChart";
-import { getCurrentAssessment } from "@/lib/engine";
+import { OnboardingChecklist } from "@/components/OnboardingChecklist";
+import { getCurrentAssessment, submitAssessment } from "@/lib/engine";
+import { exportAssessmentPdf } from "@/lib/exportPdf";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target, BarChart3 } from "lucide-react";
+import {
+  ArrowRight, Check, X, Lightbulb, MessageCircle, Sliders, Target, BarChart3,
+  Plus, FileDown, Share2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const attempts = storage.getAttempts();
   const habits = storage.getHabits();
   const goal = storage.getGoal();
+  const user = storage.getUser();
+  const profile = storage.getProfile();
 
   const result = useMemo(() => getCurrentAssessment(), []);
 
   if (!result) return <Navigate to="/app/onboarding" replace />;
+
+  const handlePublish = async () => {
+    // Re-save current profile as a fresh attempt so it's pinned to the timeline
+    submitAssessment(result.profile);
+    const shareText = `My Smart Credit Score: ${result.score} (${result.riskLabel}) — approval likelihood ${result.approvalLikelihood}%.`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Smart Credit Score", text: shareText });
+        toast.success("Shared & saved to history");
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        toast.success("Saved to history · summary copied to clipboard");
+      }
+    } catch {
+      toast.success("Saved to history");
+    }
+  };
 
   const previous = attempts[1]?.score;
   const delta = previous !== undefined ? result.score - previous : 0;
@@ -50,18 +76,42 @@ const Dashboard = () => {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button asChild size="sm" className="bg-gradient-warm border-0 shadow-warm hover:opacity-95">
-              <Link to="/app/chat"><MessageCircle className="h-4 w-4 mr-1.5" /> Ask why</Link>
+            <Button
+              size="sm"
+              className="bg-gradient-warm border-0 shadow-warm hover:opacity-95"
+              onClick={() => navigate("/app/onboarding")}
+            >
+              <Plus className="h-4 w-4 mr-1.5" /> New check
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link to="/app/simulator"><Sliders className="h-4 w-4 mr-1.5" /> Run what-if</Link>
+              <Link to="/app/simulator"><Sliders className="h-4 w-4 mr-1.5" /> What-if sliders</Link>
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                exportAssessmentPdf(result, user?.name);
+                toast.success("PDF report downloaded");
+              }}
+            >
+              <FileDown className="h-4 w-4 mr-1.5" /> Export PDF
+            </Button>
+            <Button size="sm" variant="outline" onClick={handlePublish}>
+              <Share2 className="h-4 w-4 mr-1.5" /> Save & publish
             </Button>
             <Button asChild size="sm" variant="ghost">
-              <Link to="/app/onboarding">Update my info</Link>
+              <Link to="/app/chat"><MessageCircle className="h-4 w-4 mr-1.5" /> Ask why</Link>
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Onboarding checklist — hidden when all steps done */}
+      <OnboardingChecklist
+        profile={profile}
+        hasGoal={!!goal}
+        attemptsCount={attempts.length}
+      />
 
       {/* Loan verdict */}
       <div
