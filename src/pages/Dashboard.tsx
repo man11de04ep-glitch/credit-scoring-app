@@ -144,6 +144,23 @@ const Dashboard = () => {
         </ul>
       </div>
 
+      {/* Recharts factor chart */}
+      <div className="warm-card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-primary" />
+          <h2 className="font-display text-xl font-semibold">Factor strength vs weight</h2>
+        </div>
+        <FactorChart data={result.factorChartData} />
+        <div className="flex gap-5 text-xs text-muted-foreground mt-3">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-primary" /> Your sub-score (0–100)
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-accent" /> Factor weight (%)
+          </span>
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Suggestions */}
         <div className="warm-card p-6">
