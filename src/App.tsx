@@ -19,35 +19,52 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-center" />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route
-            path="/app"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Dashboard />} />
-            <Route path="onboarding" element={<Onboarding />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="simulator" element={<Simulator />} />
-            <Route path="goals" element={<Goals />} />
-            <Route path="history" element={<History />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !sessionStorage.getItem("smart-credit:splash-shown");
+  });
+
+  useEffect(() => {
+    if (!showSplash) return;
+    const t = setTimeout(() => {
+      sessionStorage.setItem("smart-credit:splash-shown", "1");
+      setShowSplash(false);
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [showSplash]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner position="top-center" />
+        {showSplash && <SplashScreen duration={3000} onDone={() => setShowSplash(false)} />}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/app"
+              element={
+                <ProtectedRoute>
+                  <AppLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="onboarding" element={<Onboarding />} />
+              <Route path="chat" element={<Chat />} />
+              <Route path="simulator" element={<Simulator />} />
+              <Route path="goals" element={<Goals />} />
+              <Route path="history" element={<History />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
