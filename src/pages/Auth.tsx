@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Info } from "lucide-react";
+import { Sparkles, Info, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +39,15 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-soft flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/")}
+          className="mb-4 -ml-2 text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
+        </Button>
         <div className="flex items-center justify-center gap-2.5 mb-8">
           <div className="h-10 w-10 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
             <Sparkles className="h-5 w-5 text-primary-foreground" />
