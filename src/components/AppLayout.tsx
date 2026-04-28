@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Sparkles, Info } from "lucide-react";
+import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Sparkles, Info, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
@@ -25,15 +25,26 @@ export const AppLayout = () => {
     <div className="min-h-screen bg-gradient-soft">
       <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
         <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
-              <Sparkles className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <p className="font-display text-lg font-semibold leading-tight">Smart Credit</p>
-              <p className="text-xs text-muted-foreground leading-tight">
-                {user ? `Hi ${user.name.split(" ")[0]}` : "Build your credit story"}
-              </p>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/")}
+              className="text-muted-foreground hover:text-foreground -ml-2"
+              aria-label="Back to home"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
+            </Button>
+            <div className="flex items-center gap-2.5">
+              <div className="h-9 w-9 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
+                <Sparkles className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="font-display text-lg font-semibold leading-tight">Smart Credit</p>
+                <p className="text-xs text-muted-foreground leading-tight">
+                  {user ? `Hi ${user.name.split(" ")[0]}` : "Build your credit story"}
+                </p>
+              </div>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
