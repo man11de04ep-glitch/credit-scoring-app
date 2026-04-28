@@ -106,6 +106,13 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Onboarding checklist — hidden when all steps done */}
+      <OnboardingChecklist
+        profile={profile}
+        hasGoal={!!goal}
+        attemptsCount={attempts.length}
+      />
+
       {/* Loan verdict */}
       <div
         className={cn(
