@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { computeScore, type FinancialProfile } from "@/lib/scoring";
+import { simulate, submitAssessment, type FinancialProfile } from "@/lib/engine";
 import { storage } from "@/lib/storage";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -12,9 +12,9 @@ import { toast } from "sonner";
 
 const Simulator = () => {
   const stored = storage.getProfile();
-  const baseline = useMemo(() => (stored ? computeScore(stored) : null), [stored]);
+  const baseline = useMemo(() => (stored ? simulate(stored) : null), [stored]);
   const [draft, setDraft] = useState<FinancialProfile | null>(stored);
-  const result = useMemo(() => (draft ? computeScore(draft) : null), [draft]);
+  const result = useMemo(() => (draft ? simulate(draft) : null), [draft]);
 
   if (!stored || !baseline || !draft || !result) return <Navigate to="/app/onboarding" replace />;
   const delta = result.score - baseline.score;
@@ -52,14 +52,7 @@ const Simulator = () => {
             <Button
               className="bg-gradient-warm border-0 shadow-warm hover:opacity-95"
               onClick={() => {
-                storage.saveProfile(draft);
-                storage.saveAttempt({
-                  id: crypto.randomUUID(),
-                  createdAt: new Date().toISOString(),
-                  profile: draft,
-                  score: result.score,
-                  band: result.band,
-                });
+                submitAssessment(draft);
                 toast.success("Saved as your new baseline");
               }}
             >
