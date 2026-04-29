@@ -208,7 +208,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "chat.history.empty": "No saved attempts yet.",
     "chat.history.line": "{date}: {score} ({band})",
     "chat.pdf.done": "PDF report downloaded.",
-    "chat.whatif.line": "If {field} grows by {n}%, your score becomes about {newScore} ({delta:+d}).",
+    "chat.whatif.line": "If {field} grows by {n}%, your score becomes about {newScore} ({delta}).",
     "chat.foir.summary": "For your {band} band the FOIR cap is {cap}%. Safe EMI {maxEmi}. You asked for {req} ({reqEmi}/mo). Verdict: {verdict}.",
 
     "foir.why.title": "Why this cap?",
@@ -421,7 +421,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "chat.history.empty": "अभी तक कोई जाँच सहेजी नहीं गई।",
     "chat.history.line": "{date}: {score} ({band})",
     "chat.pdf.done": "PDF डाउनलोड हो गई।",
-    "chat.whatif.line": "अगर {field} {n}% बढ़े, स्कोर लगभग {newScore} होगा ({delta:+d})।",
+    "chat.whatif.line": "अगर {field} {n}% बढ़े, स्कोर लगभग {newScore} होगा ({delta})।",
     "chat.foir.summary": "{band} बैंड के लिए FOIR सीमा {cap}%। सुरक्षित EMI {maxEmi}। आपने {req} माँगा ({reqEmi}/माह)। फैसला: {verdict}।",
 
     "foir.why.title": "यह सीमा क्यों?",
@@ -634,7 +634,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "chat.history.empty": "ਹਾਲੇ ਤੱਕ ਕੋਈ ਕੋਸ਼ਿਸ਼ ਸੰਭਾਲੀ ਨਹੀਂ।",
     "chat.history.line": "{date}: {score} ({band})",
     "chat.pdf.done": "PDF ਡਾਊਨਲੋਡ ਹੋ ਗਈ।",
-    "chat.whatif.line": "ਜੇ {field} {n}% ਵਧੇ, ਸਕੋਰ ਲਗਭਗ {newScore} ਹੋਵੇਗਾ ({delta:+d})।",
+    "chat.whatif.line": "ਜੇ {field} {n}% ਵਧੇ, ਸਕੋਰ ਲਗਭਗ {newScore} ਹੋਵੇਗਾ ({delta})।",
     "chat.foir.summary": "{band} ਬੈਂਡ ਲਈ FOIR ਸੀਮਾ {cap}%। ਸੁਰੱਖਿਅਤ EMI {maxEmi}। ਮੰਗੇ {req} ({reqEmi}/ਮਹੀਨਾ)। ਫੈਸਲਾ: {verdict}।",
 
     "foir.why.title": "ਇਹ ਸੀਮਾ ਕਿਉਂ?",
@@ -847,7 +847,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "chat.history.empty": "Abhi tak koi attempt save nahi hua.",
     "chat.history.line": "{date}: {score} ({band})",
     "chat.pdf.done": "PDF download ho gayi.",
-    "chat.whatif.line": "Agar {field} {n}% badhe, score lagbhag {newScore} hoga ({delta:+d}).",
+    "chat.whatif.line": "Agar {field} {n}% badhe, score lagbhag {newScore} hoga ({delta}).",
     "chat.foir.summary": "Aapke {band} band ke liye FOIR cap {cap}% hai. Safe EMI {maxEmi}. Aapne {req} maanga ({reqEmi}/mo). Verdict: {verdict}.",
 
     "foir.why.title": "Yeh cap kyun?",
@@ -1060,7 +1060,7 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "chat.history.empty": "Hale tak koi attempt save nahi hoya.",
     "chat.history.line": "{date}: {score} ({band})",
     "chat.pdf.done": "PDF download ho gayi.",
-    "chat.whatif.line": "Je tusi {field} {n}% vadhao tan score takriban {newScore} ho jayega ({delta:+d}).",
+    "chat.whatif.line": "Je tusi {field} {n}% vadhao tan score takriban {newScore} ho jayega ({delta}).",
     "chat.foir.summary": "Tuhade {band} band lai FOIR cap {cap}% hai. Safe EMI {maxEmi}. Tusi mangi {req} ({reqEmi}/mo). Verdict: {verdict}.",
 
     "foir.why.title": "Eh cap kyu?",
