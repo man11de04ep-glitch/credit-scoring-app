@@ -110,6 +110,20 @@ const Simulator = () => {
             format={(v) => `${v} mo`}
             onChange={(v) => update("employmentMonths", v)}
           />
+          <SliderRow
+            label="Desired loan amount"
+            value={draft.desiredLoanAmount}
+            min={0} max={Math.max(500000, draft.monthlyIncome * 60)} step={5000}
+            format={(v) => `₹${v.toLocaleString()}`}
+            onChange={(v) => update("desiredLoanAmount", v)}
+          />
+          <SliderRow
+            label="Loan tenure (months)"
+            value={draft.loanTenureMonths}
+            min={3} max={120} step={3}
+            format={(v) => `${v} mo`}
+            onChange={(v) => update("loanTenureMonths", v)}
+          />
 
           <div className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3">
             <div>
