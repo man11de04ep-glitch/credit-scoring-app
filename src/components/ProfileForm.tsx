@@ -204,6 +204,7 @@ export const ProfileForm = ({ initial, onSubmit, submitLabel }: ProfileFormProps
             value={p.loanTenureMonths}
             onChange={(m) => update("loanTenureMonths", Math.max(1, m))}
             maxYears={30}
+            kind="loan"
           />
         </div>
       </section>
