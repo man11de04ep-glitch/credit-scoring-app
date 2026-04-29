@@ -150,7 +150,7 @@ function answer(
     }
 
     case "pdf": {
-      exportAssessmentPdf(a, userName);
+      exportAssessmentPdf(a, userName, t);
       return t("chat.pdf.done");
     }
 
