@@ -19,9 +19,13 @@ interface FoirCardProps {
   foir: FoirAnalysis;
   /** When provided, allows the user to apply the alternative amount. */
   onUseAlternative?: (amount: number) => void;
+  /** Risk band — enables the "Why this cap?" explainer. */
+  band?: RiskBand;
+  /** Top weaknesses that moved the band — shown inside the explainer. */
+  movers?: ContributionDetail[];
 }
 
-export const FoirCard = ({ foir, onUseAlternative }: FoirCardProps) => {
+export const FoirCard = ({ foir, onUseAlternative, band, movers }: FoirCardProps) => {
   const { t } = useT();
 
   const tone =
