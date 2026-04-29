@@ -92,8 +92,8 @@ const Dashboard = () => {
               size="sm"
               variant="outline"
               onClick={() => {
-                exportAssessmentPdf(result, user?.name);
-                toast.success("PDF report downloaded");
+                exportAssessmentPdf(result, user?.name, t);
+                toast.success(t("dash.toast.pdf"));
               }}
             >
               <FileDown className="h-4 w-4 mr-1.5" /> Export PDF
