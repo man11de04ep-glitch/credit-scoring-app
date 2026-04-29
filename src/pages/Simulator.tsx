@@ -139,6 +139,8 @@ const Simulator = () => {
         </div>
       </div>
 
+      <FoirCard foir={result.foir} />
+
       {result.topWeaknesses.length > 0 && (
         <div className="warm-card p-6">
           <h2 className="font-display text-lg font-semibold mb-3">Biggest opportunities</h2>
