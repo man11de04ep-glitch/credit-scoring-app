@@ -44,6 +44,10 @@ export function normalizeInput(input: EngineInput = {}): FinancialProfile {
   const base = storage.getProfile() ?? DEFAULT_PROFILE;
   const merged: FinancialProfile = { ...base, ...stripExtras(input) };
 
+  // Convenience aliases
+  if (input.loanAmount !== undefined) merged.desiredLoanAmount = input.loanAmount;
+  if (input.loanTermMonths !== undefined) merged.loanTenureMonths = input.loanTermMonths;
+
   // If savings not provided but income/expenses are, derive it.
   if (input.monthlySavings === undefined && (input.monthlyIncome !== undefined || input.monthlyExpenses !== undefined)) {
     merged.monthlySavings = Math.max(0, merged.monthlyIncome - merged.monthlyExpenses);
@@ -69,12 +73,14 @@ function toChartData(contributions: ContributionDetail[]) {
 export function assess(input: EngineInput = {}): EngineAssessment {
   const profile = normalizeInput(input);
   const result = computeScore(profile);
+  const foir = analyzeFoir(profile, result.band);
   return {
     ...result,
     profile,
     riskBand: result.band,
     riskLabel: RISK_LABEL[result.band],
     computedAt: new Date().toISOString(),
+    foir,
     factorChartData: toChartData(result.contributions),
   };
 }
