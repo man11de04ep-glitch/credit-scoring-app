@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useT } from "@/i18n/LanguageProvider";
-
+const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useT();
   const attempts = storage.getAttempts();
