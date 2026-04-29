@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n/LanguageProvider";
 import type { FoirAnalysis } from "@/lib/foir";
+import type { ContributionDetail, RiskBand } from "@/lib/scoring";
+import { WhyCapExplainer } from "@/components/WhyCapExplainer";
 
 const fmt = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 const yearsMonths = (m: number, t: (k: string) => string) => {
