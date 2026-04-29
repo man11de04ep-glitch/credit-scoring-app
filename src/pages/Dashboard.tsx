@@ -154,6 +154,8 @@ const Dashboard = () => {
       {/* FOIR consultant verdict + Satisfying Alternative */}
       <FoirCard
         foir={result.foir}
+        band={result.band}
+        movers={result.topWeaknesses}
         onUseAlternative={(amount) => {
           submitAssessment({ ...result.profile, desiredLoanAmount: amount });
           toast.success(t("foir.alt.use"));
