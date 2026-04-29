@@ -151,6 +151,16 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* FOIR consultant verdict + Satisfying Alternative */}
+      <FoirCard
+        foir={result.foir}
+        onUseAlternative={(amount) => {
+          submitAssessment({ ...result.profile, desiredLoanAmount: amount });
+          toast.success(t("foir.alt.use"));
+          window.location.reload();
+        }}
+      />
+
       {/* Factor breakdown */}
       <div className="warm-card p-6">
         <h2 className="font-display text-xl font-semibold mb-4">What's shaping your score</h2>

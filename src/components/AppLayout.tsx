@@ -3,14 +3,16 @@ import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Info,
 import { cn } from "@/lib/utils";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useT } from "@/i18n/LanguageProvider";
 import logo from "@/assets/smart-credit-logo.png";
 
 const nav = [
-  { to: "/app", icon: LayoutDashboard, label: "Dashboard", end: true },
-  { to: "/app/chat", icon: MessageCircle, label: "Chat" },
-  { to: "/app/simulator", icon: Sliders, label: "What-if" },
-  { to: "/app/goals", icon: Target, label: "Goals" },
-  { to: "/app/history", icon: History, label: "History" },
+  { to: "/app", icon: LayoutDashboard, key: "nav.dashboard", end: true },
+  { to: "/app/chat", icon: MessageCircle, key: "nav.chat" },
+  { to: "/app/simulator", icon: Sliders, key: "nav.simulator" },
+  { to: "/app/goals", icon: Target, key: "nav.goals" },
+  { to: "/app/history", icon: History, key: "nav.history" },
 ];
 
 export const AppLayout = () => {
