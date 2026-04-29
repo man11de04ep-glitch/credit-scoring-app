@@ -9,6 +9,7 @@ import {
   type ContributionDetail,
 } from "./scoring";
 import { storage, type ScoreAttempt } from "./storage";
+import { analyzeFoir, type FoirAnalysis } from "./foir";
 
 export type EngineInput = Partial<FinancialProfile> & {
   // Convenience fields mapped onto FinancialProfile
@@ -22,6 +23,7 @@ export type EngineAssessment = ScoreResult & {
   riskBand: RiskBand;
   riskLabel: string;
   computedAt: string;
+  foir: FoirAnalysis;
   // Chart-ready data for Recharts
   factorChartData: Array<{
     name: string;
