@@ -299,4 +299,6 @@ export const DEFAULT_PROFILE: FinancialProfile = {
   pastLoanRejections: 0,
   hasEmergencyFund: false,
   employmentMonths: 8,
+  desiredLoanAmount: 100000,
+  loanTenureMonths: 24,
 };
