@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { ArrowRight, RotateCcw } from "lucide-react";
+import { FoirCard } from "@/components/FoirCard";
 import { toast } from "sonner";
 
 const Simulator = () => {
