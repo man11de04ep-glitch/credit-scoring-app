@@ -16,6 +16,7 @@ import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 import { AppLayout } from "./components/AppLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { LanguageProvider } from "./i18n/LanguageProvider";
 
 const queryClient = new QueryClient();
 
@@ -36,33 +37,35 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner position="top-center" />
-        {showSplash && <SplashScreen duration={3000} onDone={() => setShowSplash(false)} />}
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/app"
-              element={
-                <ProtectedRoute>
-                  <AppLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="onboarding" element={<Onboarding />} />
-              <Route path="chat" element={<Chat />} />
-              <Route path="simulator" element={<Simulator />} />
-              <Route path="goals" element={<Goals />} />
-              <Route path="history" element={<History />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner position="top-center" />
+          {showSplash && <SplashScreen duration={3000} onDone={() => setShowSplash(false)} />}
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/app"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="onboarding" element={<Onboarding />} />
+                <Route path="chat" element={<Chat />} />
+                <Route path="simulator" element={<Simulator />} />
+                <Route path="goals" element={<Goals />} />
+                <Route path="history" element={<History />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 };

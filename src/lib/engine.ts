@@ -9,6 +9,7 @@ import {
   type ContributionDetail,
 } from "./scoring";
 import { storage, type ScoreAttempt } from "./storage";
+import { analyzeFoir, type FoirAnalysis } from "./foir";
 
 export type EngineInput = Partial<FinancialProfile> & {
   // Convenience fields mapped onto FinancialProfile
@@ -22,6 +23,7 @@ export type EngineAssessment = ScoreResult & {
   riskBand: RiskBand;
   riskLabel: string;
   computedAt: string;
+  foir: FoirAnalysis;
   // Chart-ready data for Recharts
   factorChartData: Array<{
     name: string;
@@ -41,6 +43,10 @@ const RISK_LABEL: Record<RiskBand, string> = {
 export function normalizeInput(input: EngineInput = {}): FinancialProfile {
   const base = storage.getProfile() ?? DEFAULT_PROFILE;
   const merged: FinancialProfile = { ...base, ...stripExtras(input) };
+
+  // Convenience aliases
+  if (input.loanAmount !== undefined) merged.desiredLoanAmount = input.loanAmount;
+  if (input.loanTermMonths !== undefined) merged.loanTenureMonths = input.loanTermMonths;
 
   // If savings not provided but income/expenses are, derive it.
   if (input.monthlySavings === undefined && (input.monthlyIncome !== undefined || input.monthlyExpenses !== undefined)) {
@@ -67,12 +73,14 @@ function toChartData(contributions: ContributionDetail[]) {
 export function assess(input: EngineInput = {}): EngineAssessment {
   const profile = normalizeInput(input);
   const result = computeScore(profile);
+  const foir = analyzeFoir(profile, result.band);
   return {
     ...result,
     profile,
     riskBand: result.band,
     riskLabel: RISK_LABEL[result.band],
     computedAt: new Date().toISOString(),
+    foir,
     factorChartData: toChartData(result.contributions),
   };
 }

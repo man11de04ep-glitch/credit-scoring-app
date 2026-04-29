@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { FactorChart } from "@/components/FactorChart";
 import { OnboardingChecklist } from "@/components/OnboardingChecklist";
+import { FoirCard } from "@/components/FoirCard";
 import { getCurrentAssessment, submitAssessment } from "@/lib/engine";
 import { exportAssessmentPdf } from "@/lib/exportPdf";
 import { storage } from "@/lib/storage";
@@ -13,9 +14,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
+import { useT } from "@/i18n/LanguageProvider";
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { t } = useT();
   const attempts = storage.getAttempts();
   const habits = storage.getHabits();
   const goal = storage.getGoal();
@@ -148,6 +150,16 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* FOIR consultant verdict + Satisfying Alternative */}
+      <FoirCard
+        foir={result.foir}
+        onUseAlternative={(amount) => {
+          submitAssessment({ ...result.profile, desiredLoanAmount: amount });
+          toast.success(t("foir.alt.use"));
+          window.location.reload();
+        }}
+      />
 
       {/* Factor breakdown */}
       <div className="warm-card p-6">

@@ -3,19 +3,22 @@ import { LayoutDashboard, MessageCircle, Sliders, Target, History, LogOut, Info,
 import { cn } from "@/lib/utils";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useT } from "@/i18n/LanguageProvider";
 import logo from "@/assets/smart-credit-logo.png";
 
 const nav = [
-  { to: "/app", icon: LayoutDashboard, label: "Dashboard", end: true },
-  { to: "/app/chat", icon: MessageCircle, label: "Chat" },
-  { to: "/app/simulator", icon: Sliders, label: "What-if" },
-  { to: "/app/goals", icon: Target, label: "Goals" },
-  { to: "/app/history", icon: History, label: "History" },
+  { to: "/app", icon: LayoutDashboard, key: "nav.dashboard", end: true },
+  { to: "/app/chat", icon: MessageCircle, key: "nav.chat" },
+  { to: "/app/simulator", icon: Sliders, key: "nav.simulator" },
+  { to: "/app/goals", icon: Target, key: "nav.goals" },
+  { to: "/app/history", icon: History, key: "nav.history" },
 ];
 
 export const AppLayout = () => {
   const navigate = useNavigate();
   const user = storage.getUser();
+  const { t } = useT();
 
   const signOut = () => {
     storage.clearUser();
@@ -25,16 +28,16 @@ export const AppLayout = () => {
   return (
     <div className="min-h-screen bg-gradient-soft">
       <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
-        <header className="flex items-center justify-between mb-8">
+        <header className="flex items-center justify-between gap-3 mb-8 flex-wrap">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/")}
               className="text-muted-foreground hover:text-foreground -ml-2"
-              aria-label="Back to home"
+              aria-label={t("common.back")}
             >
-              <ArrowLeft className="h-4 w-4 mr-1.5" /> Back
+              <ArrowLeft className="h-4 w-4 mr-1.5" /> {t("common.back")}
             </Button>
             <div className="flex items-center gap-2.5">
               <img
@@ -45,16 +48,19 @@ export const AppLayout = () => {
                 className="h-9 w-9 rounded-xl shadow-warm object-cover"
               />
               <div>
-                <p className="font-display text-lg font-semibold leading-tight">Smart Credit</p>
+                <p className="font-display text-lg font-semibold leading-tight">{t("app.name")}</p>
                 <p className="text-xs text-muted-foreground leading-tight">
-                  {user ? `Hi ${user.name.split(" ")[0]}` : "Build your credit story"}
+                  {user ? t("nav.greeting", { name: user.name.split(" ")[0] }) : t("nav.greetingNew")}
                 </p>
               </div>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
-            <LogOut className="h-4 w-4 mr-1.5" /> Sign out
-          </Button>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
+              <LogOut className="h-4 w-4 mr-1.5" /> {t("common.signOut")}
+            </Button>
+          </div>
         </header>
 
         <div
@@ -63,9 +69,8 @@ export const AppLayout = () => {
         >
           <Info className="h-4 w-4 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
           <p className="leading-relaxed">
-            <span className="font-medium text-foreground">Local-only demo.</span> No accounts or
-            passwords — your data is stored only in this browser and is visible to anyone using
-            this device. Avoid entering real banking details.
+            <span className="font-medium text-foreground">{t("banner.localDemo")}</span>{" "}
+            {t("banner.localDemoDesc")}
           </p>
         </div>
 
@@ -87,7 +92,7 @@ export const AppLayout = () => {
                     }
                   >
                     <item.icon className="h-4 w-4" />
-                    {item.label}
+                    {t(item.key)}
                   </NavLink>
                 </li>
               ))}

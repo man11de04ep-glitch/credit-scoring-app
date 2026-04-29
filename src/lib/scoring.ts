@@ -13,7 +13,9 @@ export type FinancialProfile = {
   pastLoanAttempts: number;         // total prior loan applications
   pastLoanRejections: number;       // of those, how many were rejected
   hasEmergencyFund: boolean;        // > 1 month expenses saved
-  employmentMonths: number;         // months in current job / income source
+  employmentMonths: number;         // months in current job / income source (combined years*12 + months)
+  desiredLoanAmount: number;        // INR — the loan the user wants
+  loanTenureMonths: number;         // months — repayment tenure for the loan
 };
 
 export type RiskBand = "low" | "medium" | "high";
@@ -297,4 +299,6 @@ export const DEFAULT_PROFILE: FinancialProfile = {
   pastLoanRejections: 0,
   hasEmergencyFund: false,
   employmentMonths: 8,
+  desiredLoanAmount: 100000,
+  loanTenureMonths: 24,
 };
