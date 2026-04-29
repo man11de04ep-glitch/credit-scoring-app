@@ -92,8 +92,8 @@ const Dashboard = () => {
               size="sm"
               variant="outline"
               onClick={() => {
-                exportAssessmentPdf(result, user?.name);
-                toast.success("PDF report downloaded");
+                exportAssessmentPdf(result, user?.name, t);
+                toast.success(t("dash.toast.pdf"));
               }}
             >
               <FileDown className="h-4 w-4 mr-1.5" /> Export PDF
@@ -154,6 +154,8 @@ const Dashboard = () => {
       {/* FOIR consultant verdict + Satisfying Alternative */}
       <FoirCard
         foir={result.foir}
+        band={result.band}
+        movers={result.topWeaknesses}
         onUseAlternative={(amount) => {
           submitAssessment({ ...result.profile, desiredLoanAmount: amount });
           toast.success(t("foir.alt.use"));

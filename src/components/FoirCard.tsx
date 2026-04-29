@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n/LanguageProvider";
 import type { FoirAnalysis } from "@/lib/foir";
+import type { ContributionDetail, RiskBand } from "@/lib/scoring";
+import { WhyCapExplainer } from "@/components/WhyCapExplainer";
 
 const fmt = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 const yearsMonths = (m: number, t: (k: string) => string) => {
@@ -17,9 +19,13 @@ interface FoirCardProps {
   foir: FoirAnalysis;
   /** When provided, allows the user to apply the alternative amount. */
   onUseAlternative?: (amount: number) => void;
+  /** Risk band — enables the "Why this cap?" explainer. */
+  band?: RiskBand;
+  /** Top weaknesses that moved the band — shown inside the explainer. */
+  movers?: ContributionDetail[];
 }
 
-export const FoirCard = ({ foir, onUseAlternative }: FoirCardProps) => {
+export const FoirCard = ({ foir, onUseAlternative, band, movers }: FoirCardProps) => {
   const { t } = useT();
 
   const tone =
@@ -65,6 +71,12 @@ export const FoirCard = ({ foir, onUseAlternative }: FoirCardProps) => {
             </p>
           </div>
         </div>
+
+        {band && (
+          <div className="mt-4">
+            <WhyCapExplainer band={band} movers={movers ?? []} />
+          </div>
+        )}
       </div>
 
       {/* Satisfying Alternative */}

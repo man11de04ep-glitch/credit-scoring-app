@@ -139,7 +139,7 @@ const Simulator = () => {
         </div>
       </div>
 
-      <FoirCard foir={result.foir} />
+      <FoirCard foir={result.foir} band={result.band} movers={result.topWeaknesses} />
 
       {result.topWeaknesses.length > 0 && (
         <div className="warm-card p-6">

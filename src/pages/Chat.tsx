@@ -4,75 +4,228 @@ import { Bot, Send, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { storage } from "@/lib/storage";
-import { computeScore, type ScoreResult } from "@/lib/scoring";
+import { assess, getCurrentAssessment, type EngineAssessment } from "@/lib/engine";
+import { exportAssessmentPdf } from "@/lib/exportPdf";
 import { cn } from "@/lib/utils";
+import { useT, type LangCode } from "@/i18n/LanguageProvider";
 
 type Msg = { id: string; role: "user" | "bot"; content: string; time: string };
 
-const greeting = (name: string, result: ScoreResult): Msg[] => [
-  {
-    id: "g1",
-    role: "bot",
-    content: `Hi ${name.split(" ")[0]}! I'm your Smart Credit assistant. Your current score is **${result.score}** (${result.band} risk).`,
-    time: new Date().toISOString(),
-  },
-  {
-    id: "g2",
-    role: "bot",
-    content: `Try asking: "Why is my score low?", "How can I improve?", "Will my loan be approved?", or "What if I save more?"`,
-    time: new Date().toISOString(),
-  },
-];
+const HISTORY_KEY = "smart-credit:chat-history";
 
-function answer(question: string, result: ScoreResult): string {
-  const q = question.toLowerCase();
-  if (/why|low|reason|explain/.test(q)) {
-    const w = result.topWeaknesses;
-    if (w.length === 0) return `Good news — there's no major drag on your score. Your strongest signals are ${result.topStrengths.map((s) => s.label.toLowerCase()).join(" and ")}.`;
-    return `Here's what's pulling your score down most:\n\n${w
-      .map((c, i) => `${i + 1}. **${c.label}** — ${c.insight}`)
-      .join("\n")}`;
+const fmtINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
+const fmtSigned = (n: number) => (n >= 0 ? `+${n}` : `${n}`);
+
+function loadHistory(): Msg[] {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as Msg[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
-  if (/improve|raise|increase|grow|boost|better|tip|suggest/.test(q)) {
-    return `Top things you can do right now:\n\n${result.suggestions
-      .map((s, i) => `${i + 1}. ${s}`)
-      .join("\n")}`;
+}
+function saveHistory(messages: Msg[]) {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(messages.slice(-200)));
+  } catch {
+    /* ignore */
   }
-  if (/loan|approve|reject|qualify|borrow/.test(q)) {
-    const v = result.loanVerdict;
-    const fixes = v.fixes.length ? `\n\nFocus areas:\n${v.fixes.map((f) => `• ${f}`).join("\n")}` : "";
-    return `**${v.headline}**\n\n${v.reason}${fixes}`;
+}
+
+/** Multi-language intent matcher — works across EN/HI/PA/Hinglish/Pinglish. */
+function detectIntent(q: string): "whyLow" | "improve" | "foir" | "whatIf" | "history" | "pdf" | "language" | "greet" | "fallback" {
+  const s = q.toLowerCase();
+  // PDF / export
+  if (/(pdf|download|export|report|रिपोर्ट|डाउनलोड|ਰਿਪੋਰਟ|ਡਾਊਨਲੋਡ)/.test(s)) return "pdf";
+  // History
+  if (/(history|past|previous|attempt|इतिहास|पिछल|ਇਤਿਹਾਸ|ਪਿਛਲ|pichl)/.test(s)) return "history";
+  // What-if
+  if (/(what.?if|simulate|agar|je |अगर|ਜੇ|badh|बढ|ਵਧ)/.test(s)) return "whatIf";
+  // FOIR / loan eligibility / EMI
+  if (/(foir|loan|emi|eligib|कर्ज|लोन|ऋण|ਲੋਨ|ਕਰਜ਼)/.test(s)) return "foir";
+  // Why low
+  if (/(why|kyu|kyun|kyo|क्यों|क्यू|ਕਿਉਂ|low|kam|कम|ਘੱਟ|reason|कारण|ਕਾਰਨ)/.test(s)) return "whyLow";
+  // Improve
+  if (/(improve|raise|increase|better|tip|suggest|kaise|kive|कैसे|ਕਿਵੇਂ|badhau|vadhau|बढ़ाऊ|ਵਧਾਵਾਂ)/.test(s)) return "improve";
+  // Language
+  if (/(language|भाषा|ਭਾਸ਼ਾ|hindi|english|punjabi|hinglish|pinglish)/.test(s)) return "language";
+  // Greet
+  if (/(hi|hello|hey|namaste|sat sri|नमस्ते|ਸਤ ਸ੍ਰੀ)/.test(s)) return "greet";
+  return "fallback";
+}
+
+function answer(
+  intent: ReturnType<typeof detectIntent>,
+  question: string,
+  a: EngineAssessment,
+  t: (k: string, p?: Record<string, string | number>) => string,
+  userName: string,
+  lang: LangCode,
+): string {
+  switch (intent) {
+    case "greet":
+      return t("chat.greeting", {
+        name: userName.split(" ")[0],
+        score: a.score,
+        band: t(`risk.${a.band}`),
+        amount: fmtINR(a.foir.requestedAmount),
+        emi: fmtINR(a.foir.requestedEmi),
+      });
+
+    case "whyLow": {
+      const w = a.topWeaknesses;
+      if (w.length === 0) {
+        return `${t("dash.status.strong")} — ${a.summary}`;
+      }
+      return (
+        a.summary +
+        "\n\n" +
+        w.map((c, i) => `${i + 1}. **${c.label}** — ${c.insight}`).join("\n")
+      );
+    }
+
+    case "improve":
+      return a.suggestions.map((s, i) => `${i + 1}. ${s}`).join("\n");
+
+    case "foir": {
+      const verdict = t(a.foir.headlineKey);
+      return (
+        t("chat.foir.summary", {
+          band: t(`risk.${a.band}`),
+          cap: Math.round(a.foir.foirCap * 100),
+          maxEmi: fmtINR(a.foir.maxEmi),
+          req: fmtINR(a.foir.requestedAmount),
+          reqEmi: fmtINR(a.foir.requestedEmi),
+          verdict,
+        }) +
+        "\n\n" +
+        t(a.foir.reasonKey, {
+          pct: Math.round(a.foir.foirCap * 100),
+          cap: Math.round(a.foir.foirCap * 100),
+          req: Math.round(a.foir.requestedFoir * 100),
+        })
+      );
+    }
+
+    case "whatIf": {
+      // Default scenario: +20% income.
+      const m = question.match(/(\d{1,3})\s?%/);
+      const pct = m ? Math.min(200, parseInt(m[1], 10)) : 20;
+      const newIncome = Math.round(a.profile.monthlyIncome * (1 + pct / 100));
+      const next = assess({
+        ...a.profile,
+        monthlyIncome: newIncome,
+        monthlySavings: Math.max(0, newIncome - a.profile.monthlyExpenses),
+      });
+      const delta = next.score - a.score;
+      return t("chat.whatif.line", {
+        field: t("sim.slider.income"),
+        n: pct,
+        newScore: next.score,
+        delta: fmtSigned(delta),
+      });
+    }
+
+    case "history": {
+      const attempts = storage.getAttempts();
+      if (attempts.length === 0) return t("chat.history.empty");
+      const locale =
+        lang === "hi" ? "hi-IN" : lang === "pa" ? "pa-IN" : "en-IN";
+      return attempts
+        .slice(0, 5)
+        .map((at) =>
+          t("chat.history.line", {
+            date: new Date(at.createdAt).toLocaleDateString(locale, {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            }),
+            score: at.score,
+            band: t(`risk.${at.band}`),
+          }),
+        )
+        .join("\n");
+    }
+
+    case "pdf": {
+      exportAssessmentPdf(a, userName, t);
+      return t("chat.pdf.done");
+    }
+
+    case "language":
+      return t("common.language") + ": " + t("chat.subtitle");
+
+    default:
+      return t("chat.fallback");
   }
-  if (/score|number|rating/.test(q)) {
-    return `Your score is **${result.score} / 900** — that's ${result.band} risk. Approval likelihood is around **${result.approvalLikelihood}%**.`;
-  }
-  if (/save|saving/.test(q)) {
-    const c = result.contributions.find((x) => x.key === "savingsRate")!;
-    return `Savings rate carries about ${Math.round(c.weight * 100)}% of your score. ${c.insight} Aim for 20–30% of income going to savings.`;
-  }
-  if (/bill|utility|mobile|payment/.test(q)) {
-    const c = result.contributions.find((x) => x.key === "billPayments")!;
-    return `Bill payment behavior is the single biggest lever (~${Math.round(c.weight * 100)}% of your score). ${c.insight} Setting autopay is the easiest win.`;
-  }
-  if (/what if|simulate/.test(q)) {
-    return `Open the **What-if simulator** from the menu — you can drag sliders to see exactly how each habit changes your score in real time.`;
-  }
-  if (/goal|target/.test(q)) {
-    return `Head to **Goals** to set a target score and a date — I'll help you track progress with each new check.`;
-  }
-  if (/hello|hi|hey/.test(q)) {
-    return `Hey there! Ask me anything about your score — for example "why is my score low" or "how do I improve".`;
-  }
-  return `I can help with: why your score is what it is, how to improve, loan approval chances, and what-if simulations. Try one of those!`;
 }
 
 const Chat = () => {
   const profile = storage.getProfile();
   const user = storage.getUser();
-  const result = useMemo(() => (profile ? computeScore(profile) : null), [profile]);
-  const [messages, setMessages] = useState<Msg[]>(() =>
-    result ? greeting(user?.name ?? "there", result) : []
-  );
+  const { t, lang } = useT();
+  const assessment = useMemo(() => (profile ? getCurrentAssessment() : null), [profile]);
+
+  const buildGreeting = (a: EngineAssessment): Msg[] => [
+    {
+      id: "g1",
+      role: "bot",
+      content: t("chat.greeting", {
+        name: (user?.name ?? "").split(" ")[0] || "there",
+        score: a.score,
+        band: t(`risk.${a.band}`),
+        amount: fmtINR(a.foir.requestedAmount),
+        emi: fmtINR(a.foir.requestedEmi),
+      }),
+      time: new Date().toISOString(),
+    },
+    {
+      id: "g2",
+      role: "bot",
+      content:
+        t("chat.suggest") +
+        " " +
+        [t("chat.q.whyLow"), t("chat.q.foir"), t("chat.q.whatIf")].join(" · "),
+      time: new Date().toISOString(),
+    },
+  ];
+
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    const stored = loadHistory();
+    if (stored.length > 0) return stored;
+    return assessment ? buildGreeting(assessment) : [];
+  });
+
+  // Re-greet (without wiping user history) if language changes.
+  const lastLang = useRef<LangCode>(lang);
+  useEffect(() => {
+    if (lastLang.current !== lang && assessment) {
+      lastLang.current = lang;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role: "bot",
+          content: t("chat.greeting", {
+            name: (user?.name ?? "").split(" ")[0] || "there",
+            score: assessment.score,
+            band: t(`risk.${assessment.band}`),
+            amount: fmtINR(assessment.foir.requestedAmount),
+            emi: fmtINR(assessment.foir.requestedEmi),
+          }),
+          time: new Date().toISOString(),
+        },
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  useEffect(() => {
+    saveHistory(messages);
+  }, [messages]);
+
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -81,26 +234,39 @@ const Chat = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
 
-  if (!profile || !result) return <Navigate to="/app/onboarding" replace />;
+  if (!profile || !assessment) return <Navigate to="/app/onboarding" replace />;
 
-  const send = () => {
-    const text = input.trim();
+  const send = (override?: string) => {
+    const text = (override ?? input).trim();
     if (!text) return;
-    const userMsg: Msg = { id: crypto.randomUUID(), role: "user", content: text, time: new Date().toISOString() };
+    const userMsg: Msg = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: text,
+      time: new Date().toISOString(),
+    };
     setMessages((m) => [...m, userMsg]);
     setInput("");
     setTyping(true);
-    const reply = answer(text, result);
+    const intent = detectIntent(text);
+    const reply = answer(intent, text, assessment, t, user?.name ?? "", lang);
     window.setTimeout(() => {
       setMessages((m) => [
         ...m,
         { id: crypto.randomUUID(), role: "bot", content: reply, time: new Date().toISOString() },
       ]);
       setTyping(false);
-    }, 550 + Math.random() * 350);
+    }, 450 + Math.random() * 350);
   };
 
-  const quick = ["Why is my score low?", "How can I improve?", "Will my loan be approved?"];
+  const quick = [
+    t("chat.q.whyLow"),
+    t("chat.q.improve"),
+    t("chat.q.foir"),
+    t("chat.q.whatIf"),
+    t("chat.q.history"),
+    t("chat.q.pdf"),
+  ];
 
   return (
     <div className="animate-float-up">
@@ -110,8 +276,8 @@ const Chat = () => {
             <Bot className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <p className="font-medium text-sm">Smart Credit assistant</p>
-            <p className="text-xs text-muted-foreground">Knows your latest score · personalized answers</p>
+            <p className="font-medium text-sm">{t("chat.title")}</p>
+            <p className="text-xs text-muted-foreground">{t("chat.subtitle")}</p>
           </div>
         </div>
 
@@ -119,16 +285,14 @@ const Chat = () => {
           {messages.map((m) => (
             <Bubble key={m.id} role={m.role} content={m.content} />
           ))}
-          {typing && (
-            <Bubble role="bot" content="" typing />
-          )}
+          {typing && <Bubble role="bot" content="" typing />}
         </div>
 
         <div className="px-5 pb-3 flex flex-wrap gap-2">
           {quick.map((q) => (
             <button
               key={q}
-              onClick={() => { setInput(q); window.setTimeout(send, 0); }}
+              onClick={() => send(q)}
               className="text-xs px-3 py-1.5 rounded-full border border-border bg-background hover:bg-secondary ease-soft transition-colors"
             >
               {q}
@@ -137,17 +301,21 @@ const Chat = () => {
         </div>
 
         <form
-          onSubmit={(e) => { e.preventDefault(); send(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            send();
+          }}
           className="p-4 border-t border-border/60 flex gap-2"
         >
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your score…"
+            placeholder={t("chat.placeholder")}
             className="bg-background"
           />
           <Button type="submit" className="bg-gradient-warm border-0 shadow-warm hover:opacity-95">
             <Send className="h-4 w-4" />
+            <span className="sr-only">{t("chat.send")}</span>
           </Button>
         </form>
       </div>
@@ -177,7 +345,9 @@ const Bubble = ({ role, content, typing = false }: { role: Msg["role"]; content:
       >
         {typing ? (
           <span className="inline-flex gap-1">
-            <Dot /><Dot delay={0.15} /><Dot delay={0.3} />
+            <Dot />
+            <Dot delay={0.15} />
+            <Dot delay={0.3} />
           </span>
         ) : (
           renderMarkdownLite(content)

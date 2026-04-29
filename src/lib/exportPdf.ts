@@ -1,7 +1,16 @@
 import jsPDF from "jspdf";
 import type { EngineAssessment } from "./engine";
 
-export function exportAssessmentPdf(a: EngineAssessment, userName?: string) {
+type T = (key: string, params?: Record<string, string | number>) => string;
+
+/**
+ * Generate a Smart Credit PDF report.
+ * Pass a translator `t` to localise headings & FOIR strings; falls back to English.
+ */
+export function exportAssessmentPdf(a: EngineAssessment, userName?: string, t?: T) {
+  const tr = (key: string, fallback: string, params?: Record<string, string | number>) =>
+    t ? t(key, params) : fallback;
+
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
   let y = 56;
@@ -26,14 +35,14 @@ export function exportAssessmentPdf(a: EngineAssessment, userName?: string) {
   doc.setTextColor(30, 25, 20);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("Your Score", 40, y);
+  doc.text(tr("dash.label", "Smart Credit Score"), 40, y);
   y += 24;
   doc.setFontSize(36);
   doc.setTextColor(220, 90, 60);
   doc.text(String(a.score), 40, y);
   doc.setFontSize(11);
   doc.setTextColor(80, 70, 65);
-  doc.text(`${a.riskLabel}  ·  Approval likelihood ${a.approvalLikelihood}%`, 110, y - 8);
+  doc.text(`${a.riskLabel}  ·  ${tr("dash.approval", "Approval likelihood")} ${a.approvalLikelihood}%`, 110, y - 8);
   doc.text(a.summary, 110, y + 8, { maxWidth: W - 150 });
 
   y += 40;
@@ -56,11 +65,53 @@ export function exportAssessmentPdf(a: EngineAssessment, userName?: string) {
   doc.text(reasonLines, 40, y);
   y += reasonLines.length * 14 + 10;
 
-  // Factor breakdown
+  // FOIR analysis (localised)
+  if (y > 720) { doc.addPage(); y = 60; }
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(30, 25, 20);
-  doc.text("Factor Breakdown", 40, y);
+  doc.text(tr("foir.title", "Loan eligibility & FOIR analysis"), 40, y);
+  y += 18;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(11);
+  const headline = tr(a.foir.headlineKey, a.foir.verdict);
+  doc.text(headline, 40, y);
+  y += 16;
+  const reason = tr(a.foir.reasonKey, "", {
+    pct: Math.round(a.foir.foirCap * 100),
+    cap: Math.round(a.foir.foirCap * 100),
+    req: Math.round(a.foir.requestedFoir * 100),
+  });
+  if (reason) {
+    doc.setTextColor(100, 90, 85);
+    const lines = doc.splitTextToSize(reason, W - 80);
+    doc.text(lines, 40, y);
+    y += lines.length * 14 + 4;
+  }
+  doc.setTextColor(60, 50, 45);
+  doc.setFontSize(10);
+  doc.text(
+    `${tr("foir.cap", "FOIR cap")}: ${Math.round(a.foir.foirCap * 100)}%  ·  ` +
+      `${tr("foir.maxEmi", "Max safe EMI")}: ₹${a.foir.maxEmi.toLocaleString("en-IN")}  ·  ` +
+      `${tr("foir.maxLoan", "Max safe loan")}: ₹${a.foir.maxPrincipal.toLocaleString("en-IN")}`,
+    40,
+    y,
+  );
+  y += 14;
+  doc.text(
+    `${tr("foir.alt.amount", "Suggested amount")}: ₹${a.foir.alternativeAmount.toLocaleString("en-IN")}  ·  ` +
+      `${tr("foir.alt.emi", "Comfortable EMI")}: ₹${a.foir.alternativeEmi.toLocaleString("en-IN")}`,
+    40,
+    y,
+  );
+  y += 22;
+
+  // Factor breakdown
+  if (y > 720) { doc.addPage(); y = 60; }
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(13);
+  doc.setTextColor(30, 25, 20);
+  doc.text(tr("dash.shaping", "Factor Breakdown"), 40, y);
   y += 16;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
@@ -93,7 +144,7 @@ export function exportAssessmentPdf(a: EngineAssessment, userName?: string) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
   doc.setTextColor(30, 25, 20);
-  doc.text("Personalized Suggestions", 40, y);
+  doc.text(tr("dash.suggestions", "Personalized Suggestions"), 40, y);
   y += 16;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
