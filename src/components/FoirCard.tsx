@@ -71,6 +71,12 @@ export const FoirCard = ({ foir, onUseAlternative, band, movers }: FoirCardProps
             </p>
           </div>
         </div>
+
+        {band && (
+          <div className="mt-4">
+            <WhyCapExplainer band={band} movers={movers ?? []} />
+          </div>
+        )}
       </div>
 
       {/* Satisfying Alternative */}
