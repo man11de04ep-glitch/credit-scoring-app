@@ -235,6 +235,77 @@ export const SnapshotDetail = ({ attempt, open, onOpenChange }: SnapshotDetailPr
           </section>
         )}
 
+        {/* What-if per-factor deltas vs the original snapshot */}
+        {whatIf && whatIfResult && (
+          <section className="mt-5">
+            <h3 className="text-sm font-medium mb-2">
+              Per-factor impact vs snapshot
+            </h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              How each factor moves your score relative to {dateLabel}.
+            </p>
+            <ul className="space-y-2">
+              {data.past.contributions
+                .map((p) => {
+                  const w = whatIfResult.contributions.find((x) => x.key === p.key)!;
+                  return {
+                    key: p.key,
+                    label: p.label,
+                    pastSub: p.rawSubScore,
+                    nowSub: w.rawSubScore,
+                    delta: (w.rawSubScore - p.rawSubScore) * p.weight * 600,
+                    insight: w.insight,
+                  };
+                })
+                .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+                .map((f) => {
+                  const dir = f.delta > 0.5 ? "up" : f.delta < -0.5 ? "down" : "flat";
+                  return (
+                    <li
+                      key={f.key}
+                      className="grid grid-cols-[auto_1fr_auto] gap-3 items-center px-3 py-2.5 rounded-xl border border-border bg-background"
+                    >
+                      <span
+                        className={cn(
+                          "h-7 w-7 rounded-full flex items-center justify-center shrink-0",
+                          dir === "up" && "bg-accent/15 text-accent",
+                          dir === "down" && "bg-destructive/15 text-destructive",
+                          dir === "flat" && "bg-muted text-muted-foreground"
+                        )}
+                      >
+                        {dir === "up" ? (
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        ) : dir === "down" ? (
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        ) : (
+                          <Minus className="h-3.5 w-3.5" />
+                        )}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{f.label}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Snapshot: {Math.round(f.pastSub * 100)}% → What-if:{" "}
+                          {Math.round(f.nowSub * 100)}%
+                        </p>
+                      </div>
+                      <span
+                        className={cn(
+                          "text-sm font-semibold whitespace-nowrap",
+                          dir === "up" && "text-accent",
+                          dir === "down" && "text-destructive",
+                          dir === "flat" && "text-muted-foreground"
+                        )}
+                      >
+                        {f.delta > 0 ? "+" : ""}
+                        {f.delta.toFixed(1)} pts
+                      </span>
+                    </li>
+                  );
+                })}
+            </ul>
+          </section>
+        )}
+
         {/* Why this score */}
         {!whatIf && (
           <section className="mt-4">
