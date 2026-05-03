@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { storage } from "@/lib/storage";
+import { storage, type ScoreAttempt } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { CompareAttempts } from "@/components/CompareAttempts";
+import { SnapshotDetail } from "@/components/SnapshotDetail";
 
 const History = () => {
   const attempts = storage.getAttempts();
   const profile = storage.getProfile();
+  const [selected, setSelected] = useState<ScoreAttempt | null>(null);
   if (!profile) return <Navigate to="/app/onboarding" replace />;
 
   if (attempts.length === 0) {
