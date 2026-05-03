@@ -89,7 +89,11 @@ const History = () => {
           </thead>
           <tbody>
             {attempts.map((a) => (
-              <tr key={a.id} className="border-t border-border/60">
+              <tr
+                key={a.id}
+                onClick={() => setSelected(a)}
+                className="border-t border-border/60 cursor-pointer hover:bg-secondary/40 transition-colors"
+              >
                 <td className="px-5 py-3 text-muted-foreground">
                   {new Date(a.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
                 </td>
@@ -117,6 +121,12 @@ const History = () => {
           </tbody>
         </table>
       </div>
+
+      <SnapshotDetail
+        attempt={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </div>
   );
 };
