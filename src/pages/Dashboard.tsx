@@ -98,9 +98,6 @@ const Dashboard = () => {
             >
               <FileDown className="h-4 w-4 mr-1.5" /> Export PDF
             </Button>
-            <Button size="sm" variant="outline" onClick={handlePublish}>
-              <Share2 className="h-4 w-4 mr-1.5" /> Save & publish
-            </Button>
             <Button asChild size="sm" variant="ghost">
               <Link to="/app/chat"><MessageCircle className="h-4 w-4 mr-1.5" /> Ask why</Link>
             </Button>

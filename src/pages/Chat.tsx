@@ -38,17 +38,18 @@ function saveHistory(messages: Msg[]) {
 function detectIntent(q: string): "whyLow" | "improve" | "foir" | "whatIf" | "history" | "pdf" | "language" | "greet" | "fallback" {
   const s = q.toLowerCase();
   // PDF / export
-  if (/(pdf|download|export|report|रिपोर्ट|डाउनलोड|ਰਿਪੋਰਟ|ਡਾਊਨਲੋਡ)/.test(s)) return "pdf";
+ // PDF / export
+  if (/(pdf|download|export|report|ਰਿਪੋਰਟ|डाउनलोड|रिपोर्ट|ਰਸੀਦ|file|receipt)/.test(s)) return "pdf";
   // History
-  if (/(history|past|previous|attempt|इतिहास|पिछल|ਇਤਿਹਾਸ|ਪਿਛਲ|pichl)/.test(s)) return "history";
+  if (/(history|past|previous|attempt|ਇਤਿਹਾਸ|ਪਿਛਲਾ|पुराना|ਪਹਿਲਾਂ ਵਾਲਾ|pichla|purana)/.test(s)) return "history";
   // What-if
-  if (/(what.?if|simulate|agar|je |अगर|ਜੇ|badh|बढ|ਵਧ)/.test(s)) return "whatIf";
+  if (/(what\.?if|simulate|agar|je|अगर|ਜੇ|badh|vadh|ਕਿਵੇਂ ਵਧੇਗਾ|calculator)/.test(s)) return "whatIf";
   // FOIR / loan eligibility / EMI
-  if (/(foir|loan|emi|eligib|कर्ज|लोन|ऋण|ਲੋਨ|ਕਰਜ਼)/.test(s)) return "foir";
-  // Why low
-  if (/(why|kyu|kyun|kyo|क्यों|क्यू|ਕਿਉਂ|low|kam|कम|ਘੱਟ|reason|कारण|ਕਾਰਨ)/.test(s)) return "whyLow";
+  if (/(foir|loan|emi|eligib|ਕਿਸ਼ਤ|ਕਰਜ਼|लोन|ऋण|लेਣਾ|ਕਿੰਨਾ ਮਿਲੇਗਾ)/.test(s)) return "foir";
+  // why low
+  if (/(why|kyu|kyun|kyo|ਕਿਉਂ|ਘੱਟ|low|kam|ਕਮ|reason|ਕਾਰਣ|ਵਜ੍ਹਾ)/.test(s)) return "whyLow";
   // Improve
-  if (/(improve|raise|increase|better|tip|suggest|kaise|kive|कैसे|ਕਿਵੇਂ|badhau|vadhau|बढ़ाऊ|ਵਧਾਵਾਂ)/.test(s)) return "improve";
+  if (/(improve|raise|increase|better|tip|suggest|kaise|ਕਿਵੇਂ|ਵਧਾਓ|vadhao|vadhau)/.test(s)) return "improve";
   // Language
   if (/(language|भाषा|ਭਾਸ਼ਾ|hindi|english|punjabi|hinglish|pinglish)/.test(s)) return "language";
   // Greet
