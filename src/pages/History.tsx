@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { storage } from "@/lib/storage";
+import { storage, type ScoreAttempt } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { CompareAttempts } from "@/components/CompareAttempts";
+import { SnapshotDetail } from "@/components/SnapshotDetail";
 
 const History = () => {
   const attempts = storage.getAttempts();
   const profile = storage.getProfile();
+  const [selected, setSelected] = useState<ScoreAttempt | null>(null);
   if (!profile) return <Navigate to="/app/onboarding" replace />;
 
   if (attempts.length === 0) {
@@ -86,7 +89,11 @@ const History = () => {
           </thead>
           <tbody>
             {attempts.map((a) => (
-              <tr key={a.id} className="border-t border-border/60">
+              <tr
+                key={a.id}
+                onClick={() => setSelected(a)}
+                className="border-t border-border/60 cursor-pointer hover:bg-secondary/40 transition-colors"
+              >
                 <td className="px-5 py-3 text-muted-foreground">
                   {new Date(a.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
                 </td>
@@ -114,6 +121,12 @@ const History = () => {
           </tbody>
         </table>
       </div>
+
+      <SnapshotDetail
+        attempt={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </div>
   );
 };
