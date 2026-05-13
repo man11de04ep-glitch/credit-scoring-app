@@ -22,9 +22,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useT } from "@/i18n/LanguageProvider";
 
 const History = () => {
+  const { t } = useT();
+  const { toast } = useToast();
   const attempts = storage.getAttempts();
   const profile = storage.getProfile();
   const [selected, setSelected] = useState<ScoreAttempt | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   if (!profile) return <Navigate to="/app/onboarding" replace />;
 
   if (attempts.length === 0) {
