@@ -294,14 +294,36 @@ const Chat = () => {
   return (
     <div className="animate-float-up">
       <div className="warm-card flex flex-col h-[calc(100vh-10rem)] min-h-[520px]">
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-border/60">
-          <div className="h-10 w-10 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
-            <Bot className="h-5 w-5 text-primary-foreground" />
+        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border/60">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-warm flex items-center justify-center shadow-warm">
+              <Bot className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">{t("chat.title")}</p>
+              <p className="text-xs text-muted-foreground">{t("chat.subtitle")}</p>
+            </div>
           </div>
-          <div>
-            <p className="font-medium text-sm">{t("chat.title")}</p>
-            <p className="text-xs text-muted-foreground">{t("chat.subtitle")}</p>
-          </div>
+          <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive gap-1.5">
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("chat.clear")}</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("chat.clear")}</AlertDialogTitle>
+                <AlertDialogDescription>{t("chat.clearConfirm")}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClear} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  {t("common.delete")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
