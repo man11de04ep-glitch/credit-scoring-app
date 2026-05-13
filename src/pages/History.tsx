@@ -1,9 +1,25 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { Trash2 } from "lucide-react";
 import { storage, type ScoreAttempt } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { CompareAttempts } from "@/components/CompareAttempts";
 import { SnapshotDetail } from "@/components/SnapshotDetail";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useT } from "@/i18n/LanguageProvider";
 
 const History = () => {
   const attempts = storage.getAttempts();
