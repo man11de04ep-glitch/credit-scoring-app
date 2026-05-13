@@ -45,6 +45,11 @@ export const storage = {
     all.unshift(attempt);
     localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(all.slice(0, 50)));
   },
+  deleteAttempts: (ids: string[]) => {
+    const all = storage.getAttempts();
+    const filtered = all.filter((a) => !ids.includes(a.id));
+    localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(filtered));
+  },
   getProfile: (): FinancialProfile | null =>
     safeParse<FinancialProfile | null>(localStorage.getItem(PROFILE_KEY), null),
   saveProfile: (p: FinancialProfile) =>
