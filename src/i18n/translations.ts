@@ -246,6 +246,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "common.year": "व",
     "common.month": "मा",
     "common.language": "भाषा",
+    "common.delete": "हटाएँ",
+    "common.selectAll": "सब चुनें",
 
     "nav.dashboard": "डैशबोर्ड",
     "nav.chat": "चैट",
@@ -459,6 +461,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "common.year": "ਸਾ",
     "common.month": "ਮਹੀ",
     "common.language": "ਭਾਸ਼ਾ",
+    "common.delete": "ਹਟਾਓ",
+    "common.selectAll": "ਸਭ ਚੁਣੋ",
 
     "nav.dashboard": "ਡੈਸ਼ਬੋਰਡ",
     "nav.chat": "ਚੈਟ",
@@ -672,6 +676,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "common.year": "yr",
     "common.month": "mo",
     "common.language": "Bhasha",
+    "common.delete": "Delete",
+    "common.selectAll": "Sab select karo",
 
     "nav.dashboard": "Dashboard",
     "nav.chat": "Chat",
@@ -885,6 +891,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "common.year": "yr",
     "common.month": "mo",
     "common.language": "Bhasha",
+    "common.delete": "Hatao",
+    "common.selectAll": "Sab chuno",
 
     "nav.dashboard": "Dashboard",
     "nav.chat": "Chat",
