@@ -39,6 +39,33 @@ const History = () => {
     );
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedIds.size === attempts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(attempts.map((a) => a.id)));
+    }
+  };
+
+  const handleDelete = () => {
+    const ids = Array.from(selectedIds);
+    storage.deleteAttempts(ids);
+    setAttempts((prev) => prev.filter((a) => !ids.includes(a.id)));
+    setSelectedIds(new Set());
+    setShowDeleteDialog(false);
+    setSelected(null);
+    toast({ description: `${ids.length} record(s) deleted.` });
+  };
+
   // Build chart data — oldest to newest
   const chronological = [...attempts].reverse();
   const min = Math.min(...chronological.map((a) => a.score), 300);
@@ -97,9 +124,40 @@ const History = () => {
       <CompareAttempts attempts={attempts} />
 
       <div className="warm-card overflow-hidden">
+        {selectedIds.size > 0 && (
+          <div className="flex items-center justify-between px-5 py-2.5 bg-secondary/40 border-b border-border/60">
+            <span className="text-sm font-medium">{selectedIds.size} selected</span>
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="gap-1.5">
+                  <Trash2 className="h-4 w-4" />
+                  {t("history.deleteSelected")}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("history.deleteSelected")}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("history.deleteConfirm")}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    {t("common.delete")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
         <table className="w-full text-sm">
           <thead className="bg-secondary/60">
             <tr className="text-left">
+              <th className="px-5 py-3 font-medium w-10">
+                <Checkbox
+                  checked={selectedIds.size === attempts.length && attempts.length > 0}
+                  onCheckedChange={selectAll}
+                />
+              </th>
               <th className="px-5 py-3 font-medium">Date</th>
               <th className="px-5 py-3 font-medium">Score</th>
               <th className="px-5 py-3 font-medium">Risk</th>
@@ -114,6 +172,12 @@ const History = () => {
                 onClick={() => setSelected(a)}
                 className="border-t border-border/60 cursor-pointer hover:bg-secondary/40 transition-colors"
               >
+                <td className="px-5 py-3" onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedIds.has(a.id)}
+                    onCheckedChange={() => toggleSelect(a.id)}
+                  />
+                </td>
                 <td className="px-5 py-3 text-muted-foreground">
                   {new Date(a.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
                 </td>
