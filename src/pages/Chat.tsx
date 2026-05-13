@@ -1,8 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Bot, Send, User as UserIcon } from "lucide-react";
+import { Bot, Send, Trash2, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { storage } from "@/lib/storage";
 import { assess, getCurrentAssessment, type EngineAssessment } from "@/lib/engine";
 import { exportAssessmentPdf } from "@/lib/exportPdf";
