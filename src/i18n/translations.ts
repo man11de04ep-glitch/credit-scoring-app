@@ -31,6 +31,8 @@ export const TRANSLATIONS: Record<LangCode, Dict> = {
     "common.year": "yr",
     "common.month": "mo",
     "common.language": "Language",
+    "common.delete": "Delete",
+    "common.selectAll": "Select all",
 
     "nav.dashboard": "Dashboard",
     "nav.chat": "Chat",
