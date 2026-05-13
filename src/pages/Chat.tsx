@@ -249,6 +249,16 @@ const Chat = () => {
 
   if (!profile || !assessment) return <Navigate to="/app/onboarding" replace />;
 
+  const handleClear = () => {
+    localStorage.removeItem(HISTORY_KEY);
+    if (assessment) {
+      setMessages(buildGreeting(assessment));
+    } else {
+      setMessages([]);
+    }
+    setShowClearDialog(false);
+  };
+
   const send = (override?: string) => {
     const text = (override ?? input).trim();
     if (!text) return;
