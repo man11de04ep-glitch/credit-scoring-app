@@ -240,6 +240,7 @@ const Chat = () => {
 
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
